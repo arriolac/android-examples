@@ -10,5 +10,6 @@
 	<string name="name">display name</string>
 	<string name="passphrase">Passphrase</string>
 	<string name="confirm">Confirm</string>
-
+	<string name="problem_encrypting_database">Problem encrypting database:</string>
+	
 </resources>

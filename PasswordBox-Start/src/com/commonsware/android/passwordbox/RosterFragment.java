@@ -27,12 +27,11 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
+import com.commonsware.cwac.loaderex.acl.SQLCipherCursorLoader;
 
 public class RosterFragment extends SherlockListFragment implements
     LoaderManager.LoaderCallbacks<Cursor> {
-  private SQLiteCursorLoader loader=null;
-  private DatabaseHelper db=null;
+  private SQLCipherCursorLoader loader=null;
 
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
@@ -46,12 +45,10 @@ public class RosterFragment extends SherlockListFragment implements
                                            new int[] { android.R.id.text1 },
                                            0));
 
-    db=new DatabaseHelper(getActivity());
     getLoaderManager().initLoader(0, null, this);
 
     Loader<Cursor> genericCastsSuck=getLoaderManager().getLoader(0);
-
-    loader=(SQLiteCursorLoader)genericCastsSuck;
+    loader=(SQLCipherCursorLoader)genericCastsSuck;
 
     setHasOptionsMenu(true);
   }
@@ -87,7 +84,7 @@ public class RosterFragment extends SherlockListFragment implements
 
   @Override
   public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
-    loader=db.buildSelectAllLoader(getActivity());
+    loader = DatabaseHelper.buildSelectAllLoader(getActivity());
 
     return(loader);
   }

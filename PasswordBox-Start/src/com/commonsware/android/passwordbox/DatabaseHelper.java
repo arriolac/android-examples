@@ -14,10 +14,15 @@
 
 package com.commonsware.android.passwordbox;
 
+import java.io.IOException;
+
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import com.commonsware.cwac.loaderex.acl.SQLiteCursorLoader;
+
+import com.commonsware.cwac.loaderex.SQLCipherUtils;
+import com.commonsware.cwac.loaderex.SQLCipherUtils.State;
+import com.commonsware.cwac.loaderex.acl.SQLCipherCursorLoader;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
   private static final String DATABASE_NAME="passwordbox.db";
@@ -29,6 +34,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
   static final int SELECT_ALL_TITLE=1;
   static final int SELECT_ALL_PASSPHRASE=2;
   static final String TABLE="roster";
+  
+  private static volatile SQLiteDatabase singleton=null;
 
   public DatabaseHelper(Context context) {
     super(context, DATABASE_NAME, null, SCHEMA);
@@ -45,11 +52,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     throw new RuntimeException("How did we get here?");
   }
 
-  SQLiteCursorLoader buildSelectAllLoader(Context ctxt) {
-    return(new SQLiteCursorLoader(
-                                  ctxt,
-                                  this,
-                                  "SELECT _id, title, passphrase FROM roster ORDER BY title",
-                                  null));
+  static SQLCipherCursorLoader buildSelectAllLoader(Context ctxt) {
+    return(new SQLCipherCursorLoader(ctxt, getDatabase(),
+               "SELECT _id, title, passphrase FROM roster ORDER BY title",
+               null));
+  }
+  
+  static State getDatabaseState(Context context) { 
+      return(SQLCipherUtils.getDatabaseState(context, DATABASE_NAME));
+  }
+  
+  static void encrypt(Context ctxt, String passphrase) throws IOException {
+      SQLCipherUtils.encrypt(ctxt, DATABASE_NAME, passphrase);
+  }
+  
+  synchronized static SQLiteDatabase initDatabase(Context context, String passphrase) {
+      if (singleton == null) { 
+          singleton= new DatabaseHelper(context.getApplicationContext())
+                          .getWritableDatabase(passphrase); 
+      }
+      
+      return(singleton);
+  }
+  synchronized static SQLiteDatabase getDatabase() { 
+      return(singleton);
   }
 }
