@@ -2,6 +2,14 @@ package com.example.overdraw;
 
 import java.util.Random;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Handler.Callback;
@@ -13,13 +21,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 
 public class MainActivity extends Activity {
 	private static final int[] sPhotos = {
@@ -32,6 +33,9 @@ public class MainActivity extends Activity {
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        
+        getWindow().setBackgroundDrawable(null);
+        
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -49,6 +53,7 @@ public class MainActivity extends Activity {
     	private final Handler mHandler = new Handler(this);
     	private final Random mRandom = new Random();
 		private final ListView mListView;
+		private final Drawable mDefaultDrawable;
 
 		private final ColorFilter[] mColorsFilters = new ColorFilter[] {
 				new PorterDuffColorFilter(0xbbff0000, PorterDuff.Mode.DARKEN),
@@ -60,6 +65,7 @@ public class MainActivity extends Activity {
 		public PhotoAdapter(Context context, Bitmap[] bitmaps, ListView listView) {
     		super(context, 0, bitmaps);
 			mListView = listView;
+			mDefaultDrawable = getResources().getDrawable(R.drawable.placeholder);
     	}
 
 		@Override
@@ -71,12 +77,12 @@ public class MainActivity extends Activity {
 			convertView.setTag(position);
 
 			ImageView image = (ImageView) convertView.findViewById(R.id.photo);
-			image.getBackground().setColorFilter(mColorsFilters[mRandom.nextInt(mColorsFilters.length)]);
+			image.getDrawable().setColorFilter(mColorsFilters[mRandom.nextInt(mColorsFilters.length)]);
 
 			LayoutParams layoutParams = image.getLayoutParams();
 			layoutParams.height = getResources().getDimensionPixelSize(R.dimen.placeholder_height);
 
-			image.setImageDrawable(null);
+			image.setImageDrawable(mDefaultDrawable);
 
 			// Simulate slow loading on a separate thread
 			mHandler.sendMessageDelayed(Message.obtain(mHandler, position),
