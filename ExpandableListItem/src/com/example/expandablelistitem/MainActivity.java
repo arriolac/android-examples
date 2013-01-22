@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnItemClickListener {
     
-    private ListView mList;
+    private PostListView mList;
     private ExpandableItemAdapter mAdapter;
     
     @Override
@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
         }
         
         mAdapter = new ExpandableItemAdapter(this, R.layout.list_item, items);
-        mList = (ListView) findViewById(R.id.list_view);
+        mList = (PostListView) findViewById(R.id.list_view);
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(this);
     }
@@ -52,8 +52,11 @@ public class MainActivity extends Activity implements OnItemClickListener {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         
-        mList.setSelection(position);
+        // Put list to top
+        //mList.smoothScrollToPositionFromTop(position, 0);
+        mList.scrollToTop(position);
         
+        // Expand or collapse
         ExpandableItemTag tag = (ExpandableItemTag) view.getTag();
         if (tag.isExpanded) {
             tag.collapse();
